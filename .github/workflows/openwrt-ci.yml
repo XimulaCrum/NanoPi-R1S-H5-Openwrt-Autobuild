@@ -42,14 +42,24 @@ jobs:
           REPO_BRANCH: master
         run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH lede
 
-      - name: Clone Friendlyarm's OpenWrt source code
-        run: |
-          git clone https://github.com/friendlyarm/repo
-          sudo cp repo/repo /usr/bin/
-          mkdir friendlywrt-h5
-          cd friendlywrt-h5
-          repo init -u https://github.com/friendlyarm/friendlywrt_manifests -b master-v18.06.1 -m h5.xml --repo-url=https://github.com/friendlyarm/repo  --no-clone-bundle
-          repo sync -c  --no-clone-bundle -j$(nproc)
+- name: Fix Git environment for repo
+  run: |
+    git config --global user.name "GitHub Actions"
+    git config --global user.email "actions@github.com"
+    git config --global --add safe.directory /home/runner/work/NanoPi-R1S-H5-Openwrt-Autobuild
+    sudo apt-get update
+    sudo apt-get install -y python2
+    sudo ln -sf /usr/bin/python2 /usr/bin/python
+
+- name: Clone Friendlyarm's OpenWrt source code
+  run: |
+    git clone https://github.com/friendlyarm/repo
+    sudo install -m 755 repo/repo /usr/bin/repo
+    mkdir friendlywrt-h5
+    cd friendlywrt-h5
+    repo init -u https://github.com/friendlyarm/friendlywrt_manifests -b master -m h5.xml
+    repo sync -c --no-clone-bundle -j$(nproc)
+
 
       - name: Merge upstearm OpenWrt source
         run: |
