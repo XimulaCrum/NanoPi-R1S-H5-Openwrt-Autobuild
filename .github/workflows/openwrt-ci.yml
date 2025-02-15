@@ -76,9 +76,6 @@ jobs:
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
-      - name: SSH connection to Actions
-        uses: P3TERX/debugger-action@master
-
       - name: Backup step, only run if previous step status check is failure
         if: failure()
         run: |
